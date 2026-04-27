@@ -1,5 +1,6 @@
 # Arsenic Mitra: West Bengal Risk Navigator
 
+[![Live Demo](https://img.shields.io/badge/Live_Dashboard-Access_Now-BDE0FE?style=for-the-badge&logo=vercel)](https://vercel.com/acs-projects-dc98a426/arsenic-mitra/EfNRnyXbMEba9eC6XiHhV5SFgN8U)
 ![Project Status](https://img.shields.io/badge/Status-Research_Phase-BDE0FE?style=flat-square)
 ![License](https://img.shields.io/badge/License-MIT-A2D2FF?style=flat-square)
 ![Region](https://img.shields.io/badge/Focus-Bengal_Delta-FFC8DD?style=flat-square)
@@ -68,6 +69,10 @@ An interactive narrative-based medical assessor assists community health workers
 
 ## Disclaimer
 This platform is a simulation-supported inference engine. All groundwater management decisions must be verified against certified laboratory reports and official PHED/CGWB documentation.
+
+## Deployment
+The live instance is hosted on Vercel and can be accessed via the badge at the top of this document or directly at:
+[https://vercel.com/acs-projects-dc98a426/arsenic-mitra/EfNRnyXbMEba9eC6XiHhV5SFgN8U](https://vercel.com/acs-projects-dc98a426/arsenic-mitra/EfNRnyXbMEba9eC6XiHhV5SFgN8U)
 
 ---
 Developed for Public Health Research and Environmental Compliance.
