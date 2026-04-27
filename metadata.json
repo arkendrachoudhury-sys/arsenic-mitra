@@ -1,0 +1,6 @@
+{
+  "name": "Arsenic Mitra: West Bengal Risk Navigator",
+  "description": "Geospatial risk inference and decision support platform for arsenic contamination in West Bengal groundwater. Features mapping, medical narratives, and mitigation resource locator.",
+  "requestFramePermissions": ["geolocation", "camera"],
+  "majorCapabilities": ["AI-powered Medical Narratives", "Geospatial Interpolation", "Facility Locator"]
+}
