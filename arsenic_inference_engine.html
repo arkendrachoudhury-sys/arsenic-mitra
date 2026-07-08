@@ -206,9 +206,26 @@
             color: var(--text-primary);
         }
 
+        .map-container-3d {
+            width: 100%;
+            height: 180px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+            border: 0.5px solid var(--border-line);
+            margin: 16px 0;
+            overflow: hidden;
+            position: relative;
+        }
+
+        #terrainCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
         .data-table {
             width: 100%;
-            margin: 20px 0;
+            margin: 10px 0;
         }
 
         .table-row {
@@ -286,7 +303,11 @@
             <div class="face face-back">
                 <div class="header-group">
                     <span class="section-title">Riemannian Risk Manifold</span>
-                    <div style="font-size: 1.5rem; font-weight: 600;">Deep Analytics</div>
+                    <div style="font-size: 1.25rem; font-weight: 600;">3D Subsurface Projection</div>
+                </div>
+
+                <div class="map-container-3d">
+                    <canvas id="terrainCanvas"></canvas>
                 </div>
 
                 <div class="data-table">
@@ -511,8 +532,103 @@
             updateRotation(currentRotation);
         });
 
+        /**
+         * 3D TERRAIN RENDER ENGINE (DEM RASTER)
+         * Zero-dependency vertex projection for subsurface manifolds
+         */
+        const canvas = document.getElementById('terrainCanvas');
+        const ctx = canvas.getContext('2d');
+        let animationFrame;
+        let rotationAngle = 0;
+
+        function render3DManifold() {
+            const width = canvas.width = canvas.offsetWidth * 2;
+            const height = canvas.height = canvas.offsetHeight * 2;
+            ctx.clearRect(0, 0, width, height);
+
+            const gridSize = 20;
+            const spacing = width / (gridSize * 1.2);
+            const centerX = width / 2;
+            const centerY = height / 1.8;
+
+            rotationAngle += 0.01;
+
+            const points = [];
+            for (let i = 0; i <= gridSize; i++) {
+                points[i] = [];
+                for (let j = 0; j <= gridSize; j++) {
+                    // DEM Raster Logic: Base elevation + stochastic variance
+                    const x = (i - gridSize / 2) * spacing;
+                    const y = (j - gridSize / 2) * spacing;
+
+                    // Generate subsurface "risk height" using dispersion gradients
+                    const dist = Math.sqrt(x*x + y*y);
+                    const baseZ = Math.sin(dist * 0.05 - rotationAngle) * 10;
+
+                    // Add "DEM Hotspots": Localized risk dispersion peaks
+                    const hotspot1 = Math.exp(-Math.pow(Math.sqrt(Math.pow(x-40, 2) + Math.pow(y-40, 2)), 2) / 1000) * 30;
+                    const hotspot2 = Math.exp(-Math.pow(Math.sqrt(Math.pow(x+50, 2) + Math.pow(y+20, 2)), 2) / 800) * 25;
+
+                    const noise = Math.sin(i * 0.5) * Math.cos(j * 0.5) * 4;
+                    const z = baseZ + hotspot1 + hotspot2 + noise;
+
+                    // 3D Perspective Projection
+                    const cosA = Math.cos(0.6); // Fixed pitch
+                    const sinA = Math.sin(0.6);
+                    const cosB = Math.cos(rotationAngle); // Dynamic yaw
+                    const sinB = Math.sin(rotationAngle);
+
+                    // Transform coordinates
+                    let tx = x * cosB - y * sinB;
+                    let ty = x * sinB + y * cosB;
+                    let tz = z;
+
+                    const finalY = ty * cosA - tz * sinA;
+                    const finalZ = ty * sinA + tz * cosA;
+
+                    const scale = 400 / (400 + finalZ);
+                    points[i][j] = {
+                        px: centerX + tx * scale,
+                        py: centerY + finalY * scale,
+                        z: tz
+                    };
+                }
+            }
+
+            // Draw wireframe grid with risk-gradient coloring
+            ctx.lineWidth = 1;
+            for (let i = 0; i < gridSize; i++) {
+                for (let j = 0; j < gridSize; j++) {
+                    const p1 = points[i][j];
+                    const p2 = points[i+1][j];
+                    const p3 = points[i][j+1];
+
+                    // Map height to Apple Semantic Color (Blue to Red)
+                    const intensity = Math.min(255, Math.max(0, (p1.z + 20) * 5));
+                    ctx.strokeStyle = p1.z > 8
+                        ? `rgba(255, 69, 58, ${0.4 + intensity/400})`
+                        : `rgba(10, 132, 255, 0.25)`;
+
+                    ctx.beginPath();
+                    ctx.moveTo(p1.px, p1.py);
+                    ctx.lineTo(p2.px, p2.py);
+                    ctx.stroke();
+
+                    ctx.beginPath();
+                    ctx.moveTo(p1.px, p1.py);
+                    ctx.lineTo(p3.px, p3.py);
+                    ctx.stroke();
+                }
+            }
+
+            animationFrame = requestAnimationFrame(render3DManifold);
+        }
+
         // Initialize
-        window.addEventListener('DOMContentLoaded', runInference);
+        window.addEventListener('DOMContentLoaded', () => {
+            runInference();
+            render3DManifold();
+        });
     </script>
 </body>
 </html>
